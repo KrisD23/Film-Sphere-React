@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import SearchIcon from "./search.svg";
 import MovieCard from "./MovieCard";
-// ba5fb318
 
-const API_URL = "http://www.omdbapi.com?apikey=ba5fb318";
+const API_URL = `http://www.omdbapi.com?apikey=${process.env.REACT_APP_OMDB_API_KEY}`;
 
 // App componet
 function App() {
@@ -17,7 +16,7 @@ function App() {
     setMovies(data.Search);
   };
   useEffect(() => {
-    searchMovies("Spiderman");
+    searchMovies("Batman");
   }, []);
 
   return (
