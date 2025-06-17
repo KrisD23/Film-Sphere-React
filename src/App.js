@@ -9,12 +9,25 @@ const API_URL = `http://www.omdbapi.com?apikey=${process.env.REACT_APP_OMDB_API_
 function App() {
   const [movies, setMovies] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const searchMovies = async (title) => {
-    const response = await fetch(`${API_URL}&s=${title}`);
-    const data = await response.json();
+  const [loading, setLoading] = useState(false);
 
-    setMovies(data.Search);
+  const searchMovies = async (title, e) => {
+    // Prevent page reload if event is provided
+    if (e) e.preventDefault();
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}&s=${title}`);
+      const data = await response.json();
+
+      setMovies(data.Search || []);
+    } catch (error) {
+      console.error("Error fetching movies:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
   useEffect(() => {
     searchMovies("Batman");
   }, []);
@@ -26,24 +39,34 @@ function App() {
 
       {/* Search input */}
       <div className="search">
-        <input
-          placeholder="Movie titile"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <img
-          src={SearchIcon}
-          alt="Search"
-          onClick={() => searchMovies(searchTerm)}
-        />
+        <form onSubmit={(e) => searchMovies(searchTerm, e)}>
+          <input
+            placeholder="Movie title"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+
+          <img
+            src={SearchIcon}
+            alt="Search"
+            onClick={() => searchMovies(searchTerm)}
+          />
+        </form>
       </div>
 
+      {/* Loading indicator */}
+      {loading ? (
+        <div className="">
+          <h2>Loading...</h2>
+        </div>
+      ) : null}
+
+      {/* Movies list */}
       {movies?.length > 0 ? (
         <div className="container">
-          {movies.map((movie) => {
-            return <MovieCard movie={movie} />;
-          })}
-          <MovieCard movie={movies[0]} />
+          {movies.map((movie, index) => (
+            <MovieCard key={index} movie={movie} />
+          ))}
         </div>
       ) : (
         <div className="empty">
