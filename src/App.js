@@ -1,80 +1,47 @@
-import { useState, useEffect } from "react";
+import { React } from "react";
+import { Helmet } from "react-helmet";
 import "./App.css";
-import SearchIcon from "./search.svg";
-import MovieCard from "./MovieCard";
+import Header from "./components/Header";
+import MoviesList from "./components/MoviesList";
+import { useMovieSearch } from "./hooks/useMovieSearch";
 
-const API_URL = `http://www.omdbapi.com?apikey=${process.env.REACT_APP_OMDB_API_KEY}`;
-
-// App componet
-function App() {
-  const [movies, setMovies] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const searchMovies = async (title, e) => {
-    // Prevent page reload if event is provided
-    if (e) e.preventDefault();
-
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_URL}&s=${title}`);
-      const data = await response.json();
-
-      setMovies(data.Search || []);
-    } catch (error) {
-      console.error("Error fetching movies:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    searchMovies("Batman");
-  }, []);
+/**
+ * Main application component for FilmSphere
+ * A React application for searching and displaying movie information
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered App component
+ */
+const App = () => {
+  // Use of custom movie search hook
+  const { movies, searchTerm, loading, error, searchMovies } = useMovieSearch();
 
   return (
     <div className="app">
-      {/* Site name */}
-      <h1>FilmSphere</h1>
+      <Helmet>
+        <title>FilmSphere - Movie Search App</title>
+        <meta
+          name="description"
+          content="Search for movies and discover new films with FilmSphere"
+        />
+        <meta name="keywords" content="movies, film, cinema, search" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Helmet>
 
-      {/* Search input */}
-      <div className="search">
-        <form onSubmit={(e) => searchMovies(searchTerm, e)}>
-          <input
-            placeholder="Movie title"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      <Header onSearch={searchMovies} initialSearchTerm={searchTerm} />
 
-          <img
-            src={SearchIcon}
-            alt="Search"
-            onClick={() => searchMovies(searchTerm)}
-          />
-        </form>
-      </div>
+      <main>
+        <MoviesList movies={movies} loading={loading} error={error} />
+      </main>
 
-      {/* Loading indicator */}
-      {loading ? (
-        <div className="">
-          <h2>Loading...</h2>
-        </div>
-      ) : null}
-
-      {/* Movies list */}
-      {movies?.length > 0 ? (
-        <div className="container">
-          {movies.map((movie, index) => (
-            <MovieCard key={index} movie={movie} />
-          ))}
-        </div>
-      ) : (
-        <div className="empty">
-          <h2>No movies found</h2>
-        </div>
-      )}
+      <footer className="footer">
+        <p>
+          &copy; {new Date().getFullYear()} FilmSphere. All rights reserved.
+        </p>
+        <p>Powered by OMDb API</p>
+      </footer>
     </div>
   );
-}
+};
 
 export default App;

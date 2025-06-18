@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start FilmSphere React App",
+      "type": "shell",
+      "command": "cd /home/krishan-dwivedi/web-2/Film-Sphere-React && npm start",
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": ["$eslint-stylish"]
+    }
+  ]
+}
